@@ -54,10 +54,12 @@ export const Scene = () => {
       },
     });
 
-    introTl.from(can1GroupRef.current.position, { y: -5, x: 1 }, 0);
-    introTl.from(can1GroupRef.current.rotation, { z: 3 }, 0);
-    introTl.from(can2GroupRef.current.position, { y: 5, x: 1 }, 0);
-    introTl.from(can2GroupRef.current.rotation, { z: 3 }, 0);
+    if (window.scrollY < 20) {
+      introTl.from(can1GroupRef.current.position, { y: -5, x: 1 }, 0);
+      introTl.from(can1GroupRef.current.rotation, { z: 3 }, 0);
+      introTl.from(can2GroupRef.current.position, { y: 5, x: 1 }, 0);
+      introTl.from(can2GroupRef.current.rotation, { z: 3 }, 0);
+    }
 
     const scrollTl = gsap.timeline({
       defaults: {
