@@ -13,6 +13,7 @@ import { TextSplitter } from "@/components/TextSplitter";
 import { Scene } from "@/components/Scene";
 import { View } from "@react-three/drei";
 import { Bubbles } from "./Bubbles";
+import { State, useStore } from "@/hooks/useStore";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -25,71 +26,79 @@ export type HeroProps = SliceComponentProps<Content.HeroSlice>;
  * Component for "Hero" Slices.
  */
 const Hero = ({ slice }: HeroProps): JSX.Element => {
-  useGSAP(() => {
-    const introTl = gsap.timeline();
+  const ready = useStore((state: State) => state.ready);
+  const isReady = useStore((state: State) => state.isReady);
 
-    introTl
-      .set(".hero", { opacity: 1 })
-      .from(".hero-header-word", {
-        scale: 3,
-        opacity: 0,
-        ease: "power4.in",
-        delay: 0.3,
-        stagger: 1,
-      })
-      .from(
-        ".hero-subheading",
-        {
+  useGSAP(
+    () => {
+      if (!ready) return;
+
+      const introTl = gsap.timeline();
+
+      introTl
+        .set(".hero", { opacity: 1 })
+        .from(".hero-header-word", {
+          scale: 3,
           opacity: 0,
-          y: 30,
+          ease: "power4.in",
+          delay: 0.3,
+          stagger: 1,
+        })
+        .from(
+          ".hero-subheading",
+          {
+            opacity: 0,
+            y: 30,
+          },
+          "+=.8",
+        )
+        .from(".hero-body", {
+          opacity: 0,
+          y: 10,
+        })
+        .from(".hero-button", {
+          opacity: 0,
+          y: 10,
+          duration: 0.6,
+        });
+
+      const scrollTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "hero",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.5,
         },
-        "+=.8",
-      )
-      .from(".hero-body", {
-        opacity: 0,
-        y: 10,
-      })
-      .from(".hero-button", {
-        opacity: 0,
-        y: 10,
-        duration: 0.6,
       });
 
-    const scrollTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "hero",
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1.5,
-      },
-    });
-
-    scrollTl
-      .fromTo(
-        "body",
-        {
-          backgroundColor: "#FDE047",
-        },
-        {
-          backgroundColor: "#D9F99D",
-          overwrite: "auto",
-        },
-        1,
-      )
-      .from(".text-side-heading .split-char", {
-        scale: 1.3,
-        y: 40,
-        rotate: -25,
-        opacity: 0,
-        stagger: 0.1,
-        ease: "back.out(3)",
-        duration: 0.5,
-      })
-      .from(".text-side-body", {
-        y: 20,
-        opacity: 0,
-      });
-  });
+      scrollTl
+        .fromTo(
+          "body",
+          {
+            backgroundColor: "#FDE047",
+          },
+          {
+            backgroundColor: "#D9F99D",
+            overwrite: "auto",
+          },
+          1,
+        )
+        .from(".text-side-heading .split-char", {
+          scale: 1.3,
+          y: 40,
+          rotate: -25,
+          opacity: 0,
+          stagger: 0.1,
+          ease: "back.out(3)",
+          duration: 0.5,
+        })
+        .from(".text-side-body", {
+          y: 20,
+          opacity: 0,
+        });
+    },
+    { dependencies: [ready] },
+  );
 
   return (
     <Bounded
